@@ -90,6 +90,7 @@ end
 
 function update_game_over()
   move_wolf()
+  if (btn(4)) _init()
 end
 
 function move_wolf()
@@ -154,7 +155,8 @@ end
 
 function draw_game_over()
   draw_common()
-  print("game over!", 44, 38, 7)
+  print("game over!", 46, 38, 7)
+  print("press 🅾️ to restart", 27, 44, 7)
 end
 
 function draw_common()
@@ -163,7 +165,7 @@ function draw_common()
   draw_hens()
   draw_wolf()
   draw_lives()
-  draw_broken_eggs()
+  draw_broken_egg()
   print("score:"..score, 2, 2, 7)
 end
 
@@ -223,7 +225,7 @@ function draw_eggs()
   end
 end
 
-function draw_broken_eggs()
+function draw_broken_egg()
   if stun > 0 then
     tspr(119, 0, 8, 5, 24, 95, last_broken_egg % 2)
   end
