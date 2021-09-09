@@ -29,7 +29,7 @@ function _init()
   -- if it belongs to [0; 1) the egg is on the tray.
   -- egg_ticks is a number of sprite frames of an egg
   egg_ticks = #egg_spr
-  -- we don't want the eggs to go too densely
+  -- we don't want the eggs to come too densely
   egg_gap_min = 1 / egg_ticks
   -- not exactly the max gap between the eggs, but a part of it
   egg_gap_max = egg_gap_min * 3
@@ -66,6 +66,7 @@ function _init()
   score = 0
   speed = 0.011
   stun = 0
+  last_broken_egg = nil
   just_caught = 0
   wolf_pos = pos.tl
   -- the list of existing eggs.
@@ -121,6 +122,7 @@ function drop_egg()
   else
     lives -= 1
     stun = 1
+    last_broken_egg = e.tray 
     eggs = {}
     if (lives == 0) state(states.game_over)
     sfx(snd.miss)
@@ -161,6 +163,7 @@ function draw_common()
   draw_hens()
   draw_wolf()
   draw_lives()
+  draw_broken_eggs()
   print("score:"..score, 2, 2, 7)
 end
 
@@ -217,6 +220,12 @@ function draw_eggs()
       local s = egg_spr[egg_idx(e) + 1]
       tspr(s.sx, s.sy, s.sw, s.sh, s.dx, s.dy, e.tray)
     end
+  end
+end
+
+function draw_broken_eggs()
+  if stun > 0 then
+    tspr(119, 0, 8, 5, 24, 95, last_broken_egg % 2)
   end
 end
 
