@@ -71,7 +71,7 @@ function _init()
   -- every frame until it's 0
   caught_dec = 0.2
   lives_total = 3
-  chicken_probability = 0.3
+  chicken_probability = 1
 
   ---------------------
   -- state variables --
@@ -81,7 +81,7 @@ function _init()
   score = 0
   speed = 0.011
   stun = 0
-  chicken_runs = false
+  chicken_running = false
   last_broken_egg = nil
   just_caught = 0
   wolf_pos = pos.tl
@@ -100,9 +100,10 @@ end
 function update_game()
   move_wolf()
   if (just_caught > 0) just_caught -= caught_dec
-  local prev_stun = stun
-  if (stun > 0) stun -= stun_dec
-  if (chicken_runs and (prev_stun == 1 or chicken_idx(prev_stun) < chicken_idx(stun))) sfx(snd.chicken)
+  if stun > 0 then
+    stun -= stun_dec
+    if (chicken_cheeping()) sfx(snd.chicken)
+  end
   if stun <= 0 then
     if lives > 0 then
       roll_eggs()
@@ -111,6 +112,12 @@ function update_game()
       sfx(snd.game_over)
     end
   end
+end
+
+function chicken_cheeping()
+  if (not chicken_running) return false
+  local prev = stun + stun_dec
+  return prev == 1 or chicken_idx(prev) < chicken_idx(stun)
 end
 
 function update_game_over()
@@ -157,7 +164,7 @@ end
 function update_miss(tray)
   lives -= 1
   stun = 1
-  chicken_runs = rnd() > 1 - chicken_probability
+  chicken_running = rnd() > 1 - chicken_probability
   last_broken_egg = tray
   eggs = {}
   sfx(snd.miss)
@@ -266,7 +273,7 @@ function draw_broken_egg()
 end
 
 function draw_chicken()
-  if chicken_runs then
+  if chicken_running then
     local s = chicken_spr[chicken_idx(stun)]
     tspr(s.sx, s.sy, s.sw, s.sh, s.dx, s.dy, last_broken_egg % 2)
   end
