@@ -112,16 +112,15 @@ function update_game()
       sfx(snd.game_over)
     end
   end
-end
-
-function chicken_cheeping()
-  if (not chicken_running) return false
-  local prev = stun + stun_dec
-  return prev == 1 or chicken_idx(prev) < chicken_idx(stun)
+  update_restart()
 end
 
 function update_game_over()
   move_wolf()
+  update_restart()
+end
+
+function update_restart()
   if (btn(4)) _init()
 end
 
@@ -130,6 +129,12 @@ function move_wolf()
   if (btn(1) and not btn(0)) wolf_pos = bor(wolf_pos, 1)
   if (btn(2) and not btn(3)) wolf_pos = band(wolf_pos, 1)
   if (btn(3) and not btn(2)) wolf_pos = bor(wolf_pos, 2)
+end
+
+function chicken_cheeping()
+  if (not chicken_running) return false
+  local prev = stun + stun_dec
+  return prev == 1 or chicken_idx(prev) < chicken_idx(stun)
 end
 
 function roll_eggs()
