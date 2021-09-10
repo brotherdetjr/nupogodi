@@ -71,7 +71,7 @@ function _init()
   -- every frame until it's 0
   caught_dec = 0.2
   lives_total = 3
-  chicken_probability = 1
+  chicken_probability = 0.3
 
   ---------------------
   -- state variables --
