@@ -110,24 +110,32 @@ function roll_eggs()
 end
 
 function drop_egg()
-  local e = eggs[1]
+  local t = eggs[1].tray
   deli(eggs, 1)
-  if e.tray == wolf_pos then
-    score += 1
-    just_caught = 1
-    speed += speed_inc
-    while (#eggs < max_eggs) do
-      add_egg()
-    end
-    sfx(snd.catch)
+  if t == wolf_pos then
+    update_catch()
   else
-    lives -= 1
-    stun = 1
-    last_broken_egg = e.tray 
-    eggs = {}
-    if (lives == 0) state(states.game_over)
-    sfx(snd.miss)
+    update_miss(t)
   end
+end
+
+function update_catch()
+  score += 1
+  just_caught = 1
+  speed += speed_inc
+  while (#eggs < max_eggs) do
+    add_egg()
+  end
+  sfx(snd.catch)
+end
+
+function update_miss(tray)
+  lives -= 1
+  stun = 1
+  last_broken_egg = tray
+  eggs = {}
+  if (lives == 0) state(states.game_over)
+  sfx(snd.miss)
 end
 
 function add_egg()
