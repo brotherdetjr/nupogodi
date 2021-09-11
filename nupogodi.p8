@@ -5,11 +5,6 @@ __lua__
 -- soviet clone of nintendo eg-26
 
 function _init()
-  ctrl_mode = 1
-  init()
-end
-
-function init()
   ---------------
   -- constants --
   ---------------
@@ -89,10 +84,23 @@ function init()
   lives_total = 3
   chicken_probability = 0.3
 
+  -------------------------
+  -- a few state vars we --
+  -- don't want to reset --
+  -------------------------
+
+  ctrl_mode = 1
+  wolf_pos = pos.tl
+
   ---------------------
-  -- state variables --
+  -- the rest of the --
+  -- state is below  --
   ---------------------
 
+  reset_state()
+end
+
+function reset_state()
   lives = lives_total
   score = 0
   speed = 0.011
@@ -100,7 +108,6 @@ function init()
   chicken_running = false
   last_broken_egg = nil
   just_caught = 0
-  wolf_pos = pos.tl
   -- the list of existing eggs.
   -- every egg is a table (a record)
   -- of {tray = ..., pos = ...}
@@ -137,7 +144,7 @@ function update_game_over()
 end
 
 function update_aux()
-  if (btnp(4)) init()
+  if (btnp(4)) reset_state()
   if (btnp(5)) ctrl_mode = ctrl_mode % #ctrl_modes + 1
 end
 
@@ -146,10 +153,10 @@ function move_wolf()
 end
 
 function ctrl_arrows()
-		if (btn(0) and not btn(1)) wolf_pos = band(wolf_pos, 2)
-		if (btn(1) and not btn(0)) wolf_pos = bor(wolf_pos, 1)
-		if (btn(2) and not btn(3)) wolf_pos = band(wolf_pos, 1)
-		if (btn(3) and not btn(2)) wolf_pos = bor(wolf_pos, 2)
+  if (btn(0) and not btn(1)) wolf_pos = band(wolf_pos, 2)
+  if (btn(1) and not btn(0)) wolf_pos = bor(wolf_pos, 1)
+  if (btn(2) and not btn(3)) wolf_pos = band(wolf_pos, 1)
+  if (btn(3) and not btn(2)) wolf_pos = bor(wolf_pos, 2)
 end
 
 function ctrl_classic()
