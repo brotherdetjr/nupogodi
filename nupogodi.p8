@@ -5,6 +5,11 @@ __lua__
 -- soviet clone of nintendo eg-26
 
 function _init()
+  ctrl_mode = 1
+  init()
+end
+
+function init()
   ---------------
   -- constants --
   ---------------
@@ -12,6 +17,17 @@ function _init()
   states = {
     game = {update = update_game, draw = draw_game},
     game_over = {update = update_game_over, draw = draw_game_over}
+  }
+  
+  ctrl_modes = {
+    {
+      handler = ctrl_arrows,
+      sprite = {sx = 88, sy = 17}
+    },
+    {
+      handler = ctrl_classic,
+      sprite = {sx = 105, sy = 17}
+    }
   }
 
   -- tl - top left, etc
@@ -112,23 +128,41 @@ function update_game()
       sfx(snd.game_over)
     end
   end
-  update_restart()
+  update_aux()
 end
 
 function update_game_over()
   move_wolf()
-  update_restart()
+  update_aux()
 end
 
-function update_restart()
-  if (btn(4)) _init()
+function update_aux()
+  if (btnp(4)) init()
+  if (btnp(5)) ctrl_mode = ctrl_mode % #ctrl_modes + 1
 end
 
 function move_wolf()
-  if (btn(0) and not btn(1)) wolf_pos = band(wolf_pos, 2)
-  if (btn(1) and not btn(0)) wolf_pos = bor(wolf_pos, 1)
-  if (btn(2) and not btn(3)) wolf_pos = band(wolf_pos, 1)
-  if (btn(3) and not btn(2)) wolf_pos = bor(wolf_pos, 2)
+  ctrl_modes[ctrl_mode].handler()
+end
+
+function ctrl_arrows()
+		if (btn(0) and not btn(1)) wolf_pos = band(wolf_pos, 2)
+		if (btn(1) and not btn(0)) wolf_pos = bor(wolf_pos, 1)
+		if (btn(2) and not btn(3)) wolf_pos = band(wolf_pos, 1)
+		if (btn(3) and not btn(2)) wolf_pos = bor(wolf_pos, 2)
+end
+
+function ctrl_classic()
+  local b = band(btn(), 15)
+  if b == 1 then
+    wolf_pos = pos.bl
+  elseif b == 2 then
+    wolf_pos = pos.tr
+  elseif b == 4 then
+    wolf_pos = pos.tl
+  elseif b == 8 then
+    wolf_pos = pos.br
+  end
 end
 
 function chicken_cheeping()
@@ -201,7 +235,6 @@ end
 function draw_game_over()
   draw_common()
   print("game over!", 46, 38, 7)
-  print("press 🅾️ to restart", 27, 44, 7)
 end
 
 function draw_common()
@@ -210,6 +243,7 @@ function draw_common()
   draw_hens()
   draw_wolf()
   draw_lives()
+  draw_bottom()
   if stun > 0 then
     draw_broken_egg()
     draw_chicken()
@@ -266,6 +300,13 @@ function draw_lives()
     local sy = l <= lives and 0 or 5
     sspr(119, sy, 8, 5, 127 - l * 9, 2)
   end
+end
+
+function draw_bottom()
+  local s = ctrl_modes[ctrl_mode].sprite
+  sspr(s.sx, s.sy, 17, 11, 2, 115)
+  print("🅾️ to restart", 27, 115, 7)
+  print("❎ to switch control mode", 27, 121, 7)
 end
 
 function draw_eggs()
