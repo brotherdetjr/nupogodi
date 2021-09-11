@@ -27,10 +27,10 @@ function _init()
   }
   
   chicken_spr = {
-    {sx = 82, sy = 20, sw = 6, sh = 6, dx = 21, dy = 88},
-    {sx = 78, sy = 20, sw = 4, sh = 6, dx = 17, dy = 91},
+    {sx = 69, sy = 20, sw = 4, sh = 6, dx = 2, dy = 92},
     {sx = 73, sy = 20, sw = 5, sh = 6, dx = 9, dy = 92},
-    {sx = 69, sy = 20, sw = 4, sh = 6, dx = 2, dy = 92}
+    {sx = 78, sy = 20, sw = 4, sh = 6, dx = 17, dy = 91},
+    {sx = 82, sy = 20, sw = 6, sh = 6, dx = 21, dy = 88}
   }
 
   -- egg position internally ranges from -inf to 1.
@@ -134,7 +134,7 @@ end
 function chicken_cheeping()
   if (not chicken_running) return false
   local prev = stun + stun_dec
-  return prev == 1 or chicken_idx(prev) < chicken_idx(stun)
+  return prev == 1 or chicken_idx(prev) > chicken_idx(stun)
 end
 
 function roll_eggs()
@@ -285,8 +285,7 @@ function draw_chicken()
 end
 
 function chicken_idx(s)
-  local n = #chicken_spr
-  return n - ceil(s * n) + 1
+  return ceil(s * #chicken_spr)
 end
 
 function tspr(sx, sy, sw, sh, dx, dy, tray)
