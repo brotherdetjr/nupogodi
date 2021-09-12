@@ -9,6 +9,7 @@ function _init()
   -- constants --
   ---------------
   states = {
+    pristine = {update = update_pristine, draw = draw_pristine},
     game = {update = update_game, draw = draw_game},
     game_over = {update = update_game_over, draw = draw_game_over}
   }
@@ -98,13 +99,14 @@ function _init()
   -- the rest of the --
   -- state is below  --
   ---------------------
-  reset_state()
+  reset_state_vars()
+  state(states.pristine)
 end
 
-function reset_state()
+function reset_state_vars()
   lives = lives_total
   score = 0
-  speed = 0.011
+  speed = 0.012
   stun = 0
   chicken_running = false
   last_broken_egg = nil
@@ -113,12 +115,17 @@ function reset_state()
   -- every egg is a table (a record)
   -- of {tray = ..., pos = ...}
   eggs = {}
-  state(states.game)
 end
 
 function state(s)
   _update = s.update
   _draw = s.draw
+end
+
+function update_pristine()
+  update_chars()
+  update_ctrl()
+  if (btnp(4)) state(states.game)
 end
 
 function update_game()
@@ -145,7 +152,14 @@ function update_game_over()
 end
 
 function update_aux()
-  if (btnp(4)) reset_state()
+  if btnp(4) then
+    reset_state_vars()
+    state(states.game)
+  end
+  update_ctrl()
+end
+
+function update_ctrl()
   if (btnp(5)) ctrl_mode = ctrl_mode % #ctrl_modes + 1
 end
 
@@ -240,24 +254,28 @@ function egg_idx(e)
   return flr(e.pos * egg_ticks)
 end
 
+function draw_pristine()
+  draw_common(true)
+end
+
 function draw_game()
-  draw_common()
+  draw_common(false)
   draw_eggs()
 end
 
 function draw_game_over()
-  draw_common()
+  draw_common(false)
   print("game over!", 46, 38, 7)
 end
 
-function draw_common()
+function draw_common(pristine)
   cls(6)
   draw_env()
   draw_hare()
   draw_hens()
   draw_wolf()
   draw_lives()
-  draw_bottom()
+  draw_bottom(pristine)
   if stun > 0 then
     draw_broken_egg()
     draw_chicken()
@@ -266,17 +284,22 @@ function draw_common()
 end
 
 function draw_env()
+  -- trays
   for t = 0, 3 do
     tspr(95, 0, 24, 17, 2, 49, t)
   end
+  -- lower part of bottom trays
   for t = 2, 3 do
     tspr(49, 14, 20, 28, 2, 53, t)
   end
-  sspr(69, 26, 14, 3, 40, 98)
-  sspr(69, 26, 14, 3, 69, 97)
-  sspr(69, 29, 14, 4, 46, 102)
-  sspr(69, 29, 14, 4, 81, 102, -14, 4)
+  -- grass in the centre
+  sspr(69, 26, 14, 3, 40, 98) -- tl
+  sspr(69, 26, 14, 3, 69, 97)  -- tr
+  sspr(69, 29, 14, 4, 46, 102) -- bl
+  sspr(69, 29, 14, 4, 81, 102, -14, 4) -- br
+  -- the weird piece of tree crown
   sspr(71, 33, 17, 14, 109, 13)
+  -- hare's house
   sspr(88, 28, 21, 27, 2, 19)
 end
 
@@ -324,10 +347,10 @@ function draw_lives()
   end
 end
 
-function draw_bottom()
+function draw_bottom(pristine)
   local s = ctrl_modes[ctrl_mode].sprite
   sspr(s.sx, s.sy, 17, 11, 2, 115)
-  print("🅾️ to restart", 25, 115, 7)
+  print("🅾️ to "..(pristine and "" or "re").."start", 25, 115, 7)
   print("❎ to switch control mode", 25, 121, 7)
 end
 
