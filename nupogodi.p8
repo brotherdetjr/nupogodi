@@ -145,8 +145,8 @@ function update_game()
   end
   if win_state >= 1 and lives > 0 and stun <= 0 then
     pal({133, 133, 5, 5, 5, 6, 7, 13, 134, 7, 7, 6, 13, 6, 7}, 1)
-    lives = 1 -- no matter how many lives - we want stop the game
     update_miss()
+    state(states.game_over)
   end
   if stun <= 0 then
     if lives > 0 then
@@ -157,15 +157,10 @@ function update_game()
       sfx(snd.game_over)
     end
   end
-  update_aux()
 end
 
 function update_game_over()
   update_chars()
-  update_aux()
-end
-
-function update_aux()
   if btnp(4) then
     reset_state_vars()
     state(states.game)
@@ -277,17 +272,19 @@ function egg_idx(e)
 end
 
 function draw_pristine()
-  draw_common(true)
+  draw_common()
+  draw_bottom()
 end
 
 function draw_game()
-  draw_common(false)
+  draw_common()
   draw_eggs()
 end
 
 function draw_game_over()
-  draw_common(false)
-  print("game over!", 45, 12, 7)
+  draw_common()
+  draw_bottom()
+  if (win_state == 0) print("game over!", 45, 12, 7)
 end
 
 function draw_common(pristine)
@@ -297,7 +294,6 @@ function draw_common(pristine)
   draw_hens()
   draw_wolf()
   draw_lives()
-  draw_bottom(pristine)
   if stun > 0 then
     draw_broken_egg()
     draw_chicken()
@@ -375,10 +371,10 @@ function draw_lives()
   end
 end
 
-function draw_bottom(pristine)
+function draw_bottom()
   local s = ctrl_modes[ctrl_mode].sprite
   sspr(s.sx, s.sy, 17, 11, 2, 115)
-  print("🅾️ to "..(pristine and "" or "re").."start", 25, 115, 7)
+  print("🅾️ to start", 25, 115, 7)
   print("❎ to switch control mode", 25, 121, 7)
 end
 
