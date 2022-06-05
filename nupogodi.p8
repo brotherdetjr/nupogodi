@@ -140,12 +140,15 @@ function update_game()
     if (chicken_cheeping()) sfx(snd.chicken)
     if (stun <= 0) chicken_running = false
   end
-  if win_state > 0 and win_state < 1 then
+  if win_state > 0 and win_state < 2 then
     win_state += win_state_inc
   end
   if win_state >= 1 and lives > 0 and stun <= 0 then
-    pal({133, 133, 5, 5, 5, 6, 7, 13, 134, 7, 7, 6, 13, 6, 7}, 1)
+    lives = 1
     update_miss()
+  end
+  if win_state >= 2 then
+    pal({133, 133, 5, 5, 5, 6, 7, 13, 134, 7, 7, 6, 13, 6, 7}, 1)
     state(states.game_over)
   end
   if stun <= 0 then
@@ -299,7 +302,7 @@ function draw_common(pristine)
     draw_chicken()
   end
   print("score:"..score, 2, 2, 7)
-  if win_state >= 1 then
+  if win_state >= 2 then
     sspr(0, 54, 51, 6, 39, 12)
   end
 end
@@ -386,7 +389,11 @@ function draw_eggs()
     end
   end
   if win_state > 0 and win_state < 1 then
-    sspr(85, 0, 5, 5, 42, 40)
+    if win_state <= 0.95 then
+      sspr(85, 0, 5, 5, 42, 40)
+    else
+      sspr(85, 0, 5, 5, 42, 40 + (win_state - 0.95) / 0.05 * 55)
+    end
   end
 end
 
